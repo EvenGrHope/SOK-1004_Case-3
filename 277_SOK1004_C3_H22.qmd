@@ -45,7 +45,7 @@ $$
 
 Tolk ligning $(4)$. Gi en konkret forklaring på hva tallet representerer.
 
-*\[Besvar Oppgave I her\]*
+*Tallet vi får ut representerer KPI (konsumprisindeksen) verdien og sier noe om hvordan inflasjonen har utviklet seg fra året før. F.eks. vil en KPI verdi på 105 (100 \* 1.05) indikere at inflasjonen steg med 5%, eller motsatt vil en KPI verdi på 95 (100 \* 0.95) indikere at inflasjonen sank med 5%.*
 
 # Oppgave II: Rydd i data
 
@@ -210,6 +210,23 @@ Nå er det deres tur til å rydde. Slett variablene `year` og `month`. Gi variab
 
 ```{r}
 # løs oppgave II her
+
+# Lager en ny "df" og fjerner variablene "year" og "month" fra den nye "df".
+df_copy <- df
+df_copy$year = NULL
+df_copy$month = NULL
+
+
+# Gir resterende variabler nye navn.
+df_copy <- df_copy %>%
+  rename("verdi" = "value") %>%
+  rename("gruppe" = "konsumgruppe") %>%
+  rename("variabel" = "statistikkvariabel")
+
+# Konverterer (mutate) variabelen "dato" fra tall (int) til dato (date) og filtrerer ut alle datoene før og inkludert "2010-12-01".
+df_copy <- df_copy %>%
+  mutate(dato = as.Date(dato)) %>%
+  filter(dato > "2010-12-01")
 ```
 
 # Oppgave III: Beregn et vektet gjennomsnitt
@@ -222,7 +239,27 @@ Del vektene i `df` på 1000, og sjekk at de summerer seg til om lag `1` for hver
 
 ```{r}
 # besvar oppgave IIIa her
+
+# Lager en ny "df" som kun inneholder "Konsumprisindeks(vekter)" og deler verdiene på 1000. 
+df_copy_2 <- df_copy %>%
+  filter(variabel == "Konsumprisindeks (vekter)") %>%
+  mutate (verdi = verdi / 1000)
+
+# Legger sammen alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
+df_total <- aggregate(df_copy_2$verdi, by = list (df_copy_2$dato), FUN = sum, na.rm = TRUE)
+
+# Gir variablene i "df_total" nye navn.
+df_total <- df_total %>%
+  rename("dato" = "Group.1") %>%
+  rename("total" = "x")
+
+# Bruker "summary" for å få minsteverdien og maximum verdien slik at jeg kan finne aviket i forhold til 1.
+df_total %>%
+  summary()
+
 ```
+
+*Når vi leser av output'en over kan vi se at det største avviket er på 0.0514 (1 - 0.9486) og det minste avviket er på 0.0191 (1 - 0.9809).*
 
 ## Oppgave IIIb: Beregn prisindeksen fra gruppene med vekter
 
@@ -230,6 +267,8 @@ Beregn en totalindeks hvor dere bruker vektene og verdiene på prisindeks i form
 
 ```{r}
 # besvar oppgave IIIb her
+
+#
 ```
 
 *\[Besvar oppgave IIIb her\]*
@@ -249,3 +288,10 @@ Lag en figur som illustrerer vekstbidraget til konsumgruppen "Elektrisitet, inkl
 I oppgave IV beregnet vi den direkte effekten av kraftpriser på konsumprisindeksen, gjennom husholdningenes eget forbruk. Diskuter hvorvidt høye kraftpriser indirekte kan bidra til konsumprisvekst.
 
 *\[Besvar oppgave V her.\]*
+
+# Kildeliste
+
+Zach, 05.04.2022, How to use as.Date() function in R (with examples), statology, hentet 18.10.2022 fra
+https://www.statology.org/as-date-function-in-r/
+
+Stackoverflow, 04.01.2019, How to sum a variable by group, Stackoverflow, hentet 18.10.2022 fra https://stackoverflow.com/questions/1660124/how-to-sum-a-variable-by-group
