@@ -240,20 +240,20 @@ Del vektene i `df` på 1000, og sjekk at de summerer seg til om lag `1` for hver
 ```{r}
 # besvar oppgave IIIa her
 
-# Lager en ny "df" som kun inneholder "Konsumprisindeks(vekter)" og deler verdiene på 1000. 
+# Lager en ny "df" der jeg har filtrert ut alle variablene bortsettfra  "Konsumprisindeks(vekter)" og deler verdiene på 1000. 
 df_copy_2 <- df_copy %>%
   filter(variabel == "Konsumprisindeks (vekter)") %>%
   mutate (verdi = verdi / 1000)
 
-# Legger sammen alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
-df_total <- aggregate(df_copy_2$verdi, by = list (df_copy_2$dato), FUN = sum, na.rm = TRUE)
+# Regner ut gjennomsnittet til alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
+df_total <- aggregate(df_copy_2["verdi"], by = list (df_copy_2["dato"]), FUN = sum, na.rm = TRUE)
 
 # Gir variablene i "df_total" nye navn.
 df_total <- df_total %>%
   rename("dato" = "Group.1") %>%
   rename("total" = "x")
 
-# Bruker "summary" for å få minsteverdien og maximum verdien slik at jeg kan finne aviket i forhold til 1.
+# Bruker "summary" for å få minste og maximum verdien slik at jeg kan finne aviket i forhold til 1.
 df_total %>%
   summary()
 
@@ -268,10 +268,15 @@ Beregn en totalindeks hvor dere bruker vektene og verdiene på prisindeks i form
 ```{r}
 # besvar oppgave IIIb her
 
-#
+# Lager en ny "df" der jeg har filtrert ut alle variablene bortsettfra  "Konsumprisindeks(2015=100)"
+df_copy_3 <- df_copy %>%
+  filter(variabel == "Konsumprisindeks (2015=100)")
+
+# Regner ut gjennomsnittet til alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
+df_totalindeks <- aggregate(df_copy_3["verdi"], by = df_copy_3["dato"], FUN = mean, na.rm = TRUE)
 ```
 
-*\[Besvar oppgave IIIb her\]*
+*Her har jeg laget en totalindeks som inneholder gjennomsnittsverdiene til alle konsumgruppene til den gitte måneden det året (fra 2011 til 2022). For å stole på om det er riktig må jeg bare stole på dataen og at jeg selv har gjort riktig. Men det er betrygende at alle verdiene ligger rundt 100.*
 
 # Oppgave IV: Beregn kraftprisens bidrag til vekst
 
@@ -279,19 +284,34 @@ Lag en figur som illustrerer vekstbidraget til konsumgruppen "Elektrisitet, inkl
 
 ```{r}
 # Besvar oppgave IV her
+
+# Lager en ny "df" der jeg har filtrert ut alle variablene bortsettfra  "Konsumprisindeks(2015=100)" og der jeg har filtrert ut alle gruppene bortsettfra "Elektrisitet inkludert nettleie"
+df_el <- df_copy %>%
+  filter(gruppe == "Elektrisitet inkludert nettleie") %>%
+  filter(variabel == "Konsumprisindeks (2015=100)")
+
+# Plotter grafen
+df_el %>%
+  ggplot(aes(x = dato, y = verdi)) +
+  geom_line() +
+  labs(x = "Åstall", y = "KPI", title = "KPI'en til elektrisitet", subtitle = "KPI'en til elektrisitet målt med standaråret 2015.") +
+  theme_bw()
 ```
 
-*\[Besvar oppgave IV her.\]*
+*På figurens x-akse kan vi se årstall og på y-aksen kan vi se KPI verdien, der 100 er standaråret 2015.*
+
+*Vi kan se prisen på elektrisitet målt for inflasjon med standaråret 2015. Som vi ser er strømmen på sitt dyreste i 2022 og på sitt billigste rundt 2012/2013.*
 
 # Oppgave V
 
 I oppgave IV beregnet vi den direkte effekten av kraftpriser på konsumprisindeksen, gjennom husholdningenes eget forbruk. Diskuter hvorvidt høye kraftpriser indirekte kan bidra til konsumprisvekst.
 
-*\[Besvar oppgave V her.\]*
+Alle trenger strøm, så når kraftprisene går opp preger det alle i ett samfunn, både privat og bedrifter. Når f.eks. en bedrift må betale mer for samme mengden energi må de begynne å selge varene sine til en høyere pris. Når alle varene som krever energi for å bli produsert blir dyrere, må lønnen til de som kjøper disse varene også gå opp for å møte den nye standaren. Da må det mer penger i omløp (inflasjon). Dette trekker da opp KPI'en.
 
 # Kildeliste
 
-Zach, 05.04.2022, How to use as.Date() function in R (with examples), statology, hentet 18.10.2022 fra
-https://www.statology.org/as-date-function-in-r/
+Johannessen, R. 05.2014, Konsumprisindeksen - en levekostnadsindeks, SSB, hentet 17.10.2022 fra https://www.ssb.no/priser-og-prisindekser/artikler-og-publikasjoner/\_attachment/203142?\_ts=1495b28c170
+
+Zach, 05.04.2022, How to use as.Date() function in R (with examples), statology, hentet 18.10.2022 fra https://www.statology.org/as-date-function-in-r/
 
 Stackoverflow, 04.01.2019, How to sum a variable by group, Stackoverflow, hentet 18.10.2022 fra https://stackoverflow.com/questions/1660124/how-to-sum-a-variable-by-group
