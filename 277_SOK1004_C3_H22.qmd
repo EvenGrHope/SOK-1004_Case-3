@@ -245,13 +245,8 @@ df_copy_2 <- df_copy %>%
   filter(variabel == "Konsumprisindeks (vekter)") %>%
   mutate (verdi = verdi / 1000)
 
-# Regner ut gjennomsnittet til alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
-df_total <- aggregate(df_copy_2["verdi"], by = list (df_copy_2["dato"]), FUN = sum, na.rm = TRUE)
-
-# Gir variablene i "df_total" nye navn.
-df_total <- df_total %>%
-  rename("dato" = "Group.1") %>%
-  rename("total" = "x")
+# Samler alle verdiene (fjerner alle NA verdiene) med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har og summerer disse sammen. 
+df_total <- aggregate(df_copy_2["verdi"], by = df_copy_2["dato"], sum, na.rm = TRUE)
 
 # Bruker "summary" for å få minste og maximum verdien slik at jeg kan finne aviket i forhold til 1.
 df_total %>%
@@ -259,7 +254,7 @@ df_total %>%
 
 ```
 
-*Når vi leser av output'en over kan vi se at det største avviket er på 0.0514 (1 - 0.9486) og det minste avviket er på 0.0191 (1 - 0.9809).*
+*Når vi leser av output'en over kan vi se at det største avviket er på 0.0514 (1 - 0.9486) og det minste avviket er på 0.0233 (1 - 0.9767).*
 
 ## Oppgave IIIb: Beregn prisindeksen fra gruppene med vekter
 
@@ -272,11 +267,11 @@ Beregn en totalindeks hvor dere bruker vektene og verdiene på prisindeks i form
 df_copy_3 <- df_copy %>%
   filter(variabel == "Konsumprisindeks (2015=100)")
 
-# Regner ut gjennomsnittet til alle verdiene med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har. 
-df_totalindeks <- aggregate(df_copy_3["verdi"], by = df_copy_3["dato"], FUN = mean, na.rm = TRUE)
+# Samler alle verdiene (fjerner alle NA verdiene) med samme dato uavhengig av hvilken statistikkvariabel og konsumgruppe de har og finner gjennomsnittet. 
+df_totalindeks <- aggregate(df_copy_3["verdi"], by = df_copy_3["dato"], mean, na.rm=TRUE)
 ```
 
-*Her har jeg laget en totalindeks som inneholder gjennomsnittsverdiene til alle konsumgruppene til den gitte måneden det året (fra 2011 til 2022). For å stole på om det er riktig må jeg bare stole på dataen og at jeg selv har gjort riktig. Men det er betrygende at alle verdiene ligger rundt 100.*
+*Her har jeg laget en totalindeks som inneholder gjennomsnittsverdiene til alle konsumgruppene til den gitte måneden det året (fra 2011 til 2022). For å stole på om det er riktig kan jeg se på året 2015 for å se at verdiene ligger på rundt 100 siden dette er året KPI totalindeksen tar utgangspunkt i.*
 
 # Oppgave IV: Beregn kraftprisens bidrag til vekst
 
@@ -300,7 +295,7 @@ df_el %>%
 
 *På figurens x-akse kan vi se årstall og på y-aksen kan vi se KPI verdien, der 100 er standaråret 2015.*
 
-*Vi kan se prisen på elektrisitet målt for inflasjon med standaråret 2015. Som vi ser er strømmen på sitt dyreste i 2022 og på sitt billigste rundt 2012/2013.*
+*Vi kan se prisen på elektrisitet målt for inflasjon med standaråret 2015. Som vi ser er strømmen på sitt dyreste i 2022 og på sitt billigste rundt 2012/2013 uavhengig av inflasjon. I starten av 2022 var strømmen dobbelt så dyr som i 2015.*
 
 # Oppgave V
 
